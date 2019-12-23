@@ -4,8 +4,25 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var h5Router = require('./routes/h5');
+var adminRouter = require('./routes/admin');
+
+var mongoose = require('mongoose');
+
+// 连接数据库
+mongoose.connect('mongodb://139.155.28.31:27017/my',{ 
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false
+})
+
+mongoose.connection.on('open', () => {
+  console.log('数据库连接成功');
+})
+mongoose.connection.on('error', () => {
+  console.log('数据库连接失败');
+})
 
 var app = express();
 
@@ -19,8 +36,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+// 路由跳转
+app.use('/', h5Router);
+app.use('/h5', h5Router);
+app.use('/admin', adminRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
