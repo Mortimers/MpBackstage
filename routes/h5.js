@@ -8,7 +8,8 @@ const APP_SECRET = 'efa30c78e41a985df72f7657ceeae473';
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  // res.render('index', { title: 'Express' });
+  res.location('/index.html');
 });
 
 router.get('/wx', (requests, responses, next) => {

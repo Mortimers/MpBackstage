@@ -2,10 +2,12 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
+var Cookies = require('cookies');
 var logger = require('morgan');
 
-var h5Router = require('./routes/h5');
-var adminRouter = require('./routes/admin');
+var h5Router = require('./routes/h5');  // 前端请求
+var adminRouter = require('./routes/admin');  // 管理后台请求
+var uploadRouter = require('./routes/upload');  //  上传文件
 
 var mongoose = require('mongoose');
 
@@ -36,10 +38,30 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// 设置cookie
+app.use(function(req, res, next) {
+  req.cookies = new Cookies(req, res)
+  // 加这段是为了给请求的加一个userInfo字段
+  req.userInfo = {};
+  if(req.cookies.get('userInfo')) {
+    try {
+      req.userInfo = JSON.parse(req.cookies.get('userInfo'))
+    }catch(e) {
+
+    }
+  }
+
+  next();
+})
+
 // 路由跳转
-app.use('/', h5Router);
 app.use('/h5', h5Router);
 app.use('/admin', adminRouter);
+app.use('/upload', uploadRouter);
+
+app.get('/', (req, res) => {
+  res.send('hello world')
+})
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
